@@ -101,3 +101,11 @@ def fn_telegram_send_msg(telegram_token, chat_id,text):
 
 def fn_pause():
     programPause = input("Press the <ENTER> key to continue...")
+
+# Функция возвращает текущую цену токена в индексной паре 'symbol'. Например symbol=BNBUSDT
+def fn_get_price(symbol, url)
+    key = url.format(symbol)
+    data = requests.get(key)
+    data = data.json()
+    price = float((f"{data['price']}"))
+    return price

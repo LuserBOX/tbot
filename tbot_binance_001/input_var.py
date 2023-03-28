@@ -1,17 +1,17 @@
 # ================ НАСТРАИВАЕМЫЕ ПАРАМЕТРЫ. Указать необходимые =================
 # УКАЗАТЬ Торговая пара
-SYMBOL = 'LTCUSDT'
+SYMBOL = 'BNBUSDT'
 # Указать индексные названия торгуемых токены. Должны быть согласованы с параметром SYMBOL
 # Этим токеном мы оплачиваем покупки
 TOKEN_1 = 'USDT'
 # Этот токен мы продаем и на его курсе пытаемся заработать.
-TOKEN_2 = 'LTC'
+TOKEN_2 = 'BNB'
 # Параметр TimeFrame. Set this timeframe on Binance TradingView Window for correct inspectors bot work
 INTERVAL = '1m'
 # Параметр отвечает за расчет индекса RSI
 LIMIT = '200'
 # Параметр указывает, какое кол-во ТОКЕНА_2 мы покупаем, для дальнейшей продажи.
-QNTY = 40
+QNTY = 0.120
 # URL for WINSOCS connect to BINANCE
 URL = 'https://api.binance.com/api/v3/ticker/price?symbol={}'
 # Минимальное пороговое значение индикатора RSI, при котором срабатает тригер на покупку. (По умолчанию = 30)

@@ -1,7 +1,6 @@
 import input_var
 import keys
 from binance.client import Client
-from keys import
 #from input_var import SYMBOL, INTERVAL, LIMIT, QNTY, URL, RSI_MIN, RSI_MAX, RSI_PERIOD, BOTNAME, EXCHANGE_COMISSION, PRICE_DIFF, TOKEN_1, TOKEN_2
 from func import fn_print_header, fn_print_current_status, fn_create_logfile, fn_write_logfile_order_buy,fn_write_logfile_order_sell, fn_top_coin, fn_telegram_send_msg, fn_pause
 from datetime import datetime
@@ -38,11 +37,34 @@ CURRENT_STATUS = 0
 DATETIME_START = datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') # Переменная сохраняет знаяение даты и времени в виде строки.
 # Отправка уваедомления в ТЕЛЕГРАМ БОТа о старте скрипта.
 fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, DATETIME_START+ '   ' +input_var.MSG_INFO_TELEGRAM_START_BOT)
+
+# Подключение к Binance
+try:
+    CLIENT = Client(keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
+
+    print('ОК. Успешное подключение.')
+except:
+    print('ОШИБКА ПОДКЛЮЧЕНИЯ.')
+fn_pause()
+
+# Запрос баланса токенов, которыми будем торговать.
+BALANCE_START_TOKEN_1 = CLIENT.get_asset_balance(asset=input_var.TOKEN_1)
+BALANCE_START_TOKEN_2 = CLIENT.get_asset_balance(asset=input_var.TOKEN_2)
+print(BALANCE_START_TOKEN_1)
+print(BALANCE_START_TOKEN_2)
+
+key = input_var.URL.format(input_var.SYMBOL)
+data = requests.get(key)
+data = data.json()
+print(data)
+price = float((f"{data['price']}"))
+print (price)
+
 # Формирование имени ЛОГ файла.
 LOGFILE_NAME = (input_var.BOTNAME + "_" + DATETIME_START + ".log")
-# Подключение к Binancesdf
-CLIENT = Client(api_key, api_secret)
-
+# Создание лог файла
+#(logfile_name, datetime_now, botname, symbol, token_1, balance_start_token1, token_2, balance_start_token2 ,interval, limit, rsi_min, rsi_max, rsi_period, qnty ):
+#fn_create_logfile(LOGFILE_NAME, DATETIME_START, input_var.BOTNAME, input_var.SYMBOL, input_var.TOKEN_1, input_var.TOKEN_2, )
 
 fn_pause()
 print(LOGFILE_NAME)
