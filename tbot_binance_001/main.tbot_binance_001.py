@@ -40,8 +40,9 @@ DATETIME_START = datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') # Переме�
 fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, DATETIME_START+ '   ' +input_var.MSG_INFO_TELEGRAM_START_BOT)
 # Формирование имени ЛОГ файла.
 LOGFILE_NAME = (input_var.BOTNAME + "_" + DATETIME_START + ".log")
-# Подключение к Binance
+# Подключение к Binancesdf
 CLIENT = Client(api_key, api_secret)
+
 
 fn_pause()
 print(LOGFILE_NAME)
