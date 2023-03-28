@@ -2,7 +2,8 @@ import input_var
 import keys
 from binance.client import Client
 #from input_var import SYMBOL, INTERVAL, LIMIT, QNTY, URL, RSI_MIN, RSI_MAX, RSI_PERIOD, BOTNAME, EXCHANGE_COMISSION, PRICE_DIFF, TOKEN_1, TOKEN_2
-from func import fn_print_header, fn_print_current_status, fn_create_logfile, fn_write_logfile_order_buy,fn_write_logfile_order_sell, fn_top_coin, fn_telegram_send_msg, fn_pause
+from func import fn_print_header, fn_print_current_status, fn_create_logfile, fn_write_logfile_order_buy,fn_write_logfile_order_sell, fn_top_coin
+from func import fn_telegram_send_msg, fn_pause, fn_get_price, fn_get_balance, fn_get_balance_locked
 from datetime import datetime
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -25,7 +26,7 @@ PRICE_SELL = 0                #
 PRICE_SELL_MIN = 0  # Минимально допустимая цена продажи, раасчитвается как PRICE_BUY + PRICE_DIFF (%)
 PRICE_BUY = 0
 PRICE_DIFF_CURRENT = 0
-PRICE_CURRENT = 0
+# PRICE_TOKEN2_CURRENT - Текущая цена токена
 PRICE_START = 0
 CURRENT_ORDER = 'Ордеров не было'
 # До первого ордера = 0, Купил, дждет продажу = 1, Продал, ждет покупку = -1
@@ -48,17 +49,14 @@ except:
 fn_pause()
 
 # Запрос баланса токенов, которыми будем торговать.
-BALANCE_START_TOKEN_1 = CLIENT.get_asset_balance(asset=input_var.TOKEN_1)
-BALANCE_START_TOKEN_2 = CLIENT.get_asset_balance(asset=input_var.TOKEN_2)
-print(BALANCE_START_TOKEN_1)
-print(BALANCE_START_TOKEN_2)
+b = fn_get_balance(CLIENT, input_var.TOKEN_1)
+print ('Баланс ТОКЕНА 1 = ', b)
+block=fn_get_balance_locked(CLIENT, input_var.TOKEN_2)
+print ('Баланс заблокировано ТОКЕНА 2 = ', block)
 
-key = input_var.URL.format(input_var.SYMBOL)
-data = requests.get(key)
-data = data.json()
-print(data)
-price = float((f"{data['price']}"))
-print (price)
+# Запрос текущей цены ТОКЕНА2
+PRICE_TOKEN2_CURRENT=fn_get_price(input_var.SYMBOL,input_var.URL)
+print ('BNB= ' , PRICE_TOKEN2_CURRENT)
 
 # Формирование имени ЛОГ файла.
 LOGFILE_NAME = (input_var.BOTNAME + "_" + DATETIME_START + ".log")

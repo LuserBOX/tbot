@@ -1,4 +1,5 @@
 import  requests
+from binance.client import Client
 
 def fn_print_header (simbol, balance_start_token1, balance_start_token2, price, interval, limit, rsi_min, rsi_max, rsi_period, qnty):
     print('Trading BOT: binance-rsi-001 STARTING....\n\n', 'BOT parameters:\n', '---------------------\n', \
@@ -103,9 +104,20 @@ def fn_pause():
     programPause = input("Press the <ENTER> key to continue...")
 
 # Функция возвращает текущую цену токена в индексной паре 'symbol'. Например symbol=BNBUSDT
-def fn_get_price(symbol, url)
+def fn_get_price(symbol, url):
     key = url.format(symbol)
     data = requests.get(key)
     data = data.json()
     price = float((f"{data['price']}"))
     return price
+
+# Функция возвращает свободный баланс токена.
+def fn_get_balance(client, token):
+    balance = client.get_asset_balance(asset=token)
+    balance = float((f"{balance['free']}"))
+    return balance
+# Функция возвращает кол-во заюлокированных (находящиеся в открытых ордерах) токенов.
+def fn_get_balance_locked(client, token):
+    balance_locked = client.get_asset_balance(asset=token)
+    balance_locked = float((f"{balance_locked['locked']}"))
+    return balance_locked
