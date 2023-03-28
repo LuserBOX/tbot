@@ -1,4 +1,4 @@
-
+import  requests
 
 def fn_print_header (simbol, balance_start_token1, balance_start_token2, price, interval, limit, rsi_min, rsi_max, rsi_period, qnty):
     print('Trading BOT: binance-rsi-001 STARTING....\n\n', 'BOT parameters:\n', '---------------------\n', \
@@ -93,3 +93,11 @@ def fn_top_coin(pd, client):
         top_coin = work[work.priceChangePercent == work.priceChangePercent.max()]
         top_coin = top_coin.symbol.values[0]
         return top_coin
+
+def fn_telegram_send_msg(telegram_token, chat_id,text):
+    url_req = "https://api.telegram.org/bot" + telegram_token + "/sendMessage" + "?chat_id=" + chat_id + "&text=" + text
+    results = requests.get(url_req)
+    print(results.json())
+
+def fn_pause():
+    programPause = input("Press the <ENTER> key to continue...")

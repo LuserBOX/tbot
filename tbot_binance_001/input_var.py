@@ -29,4 +29,5 @@ PRICE_DIFF = 0.5
 EXCHANGE_COMISSION = 0.075
 BOTNAME = 'tbot_binance(v.001)'
 LOG_FILENAME = 'tbot_binance(v.001)'
-#
+# Уведомление, отправляемое в телеграмм бот при старте скрипта.
+MSG_INFO_TELEGRAM_START_BOT ='INFO: '+ BOTNAME+' STATUS:  запущен'
