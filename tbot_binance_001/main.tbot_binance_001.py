@@ -1,7 +1,7 @@
 import input_var
 import keys
 from binance.client import Client
-from keys import BINANCE_API_KEY,BINANCE_API_SECRET, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
+from keys import
 #from input_var import SYMBOL, INTERVAL, LIMIT, QNTY, URL, RSI_MIN, RSI_MAX, RSI_PERIOD, BOTNAME, EXCHANGE_COMISSION, PRICE_DIFF, TOKEN_1, TOKEN_2
 from func import fn_print_header, fn_print_current_status, fn_create_logfile, fn_write_logfile_order_buy,fn_write_logfile_order_sell, fn_top_coin, fn_telegram_send_msg, fn_pause
 from datetime import datetime
@@ -35,11 +35,13 @@ CURRENT_STATUS = 0
 # LOGFILE_NAME - в переменной формируется имя лог файла.
 
 # =========== СТАРТ СКРИПТА ==============
-DATETIME_START = datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') # Строковая переменная сохраняет знаяение даты и времени.
+DATETIME_START = datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') # Переменная сохраняет знаяение даты и времени в виде строки.
 # Отправка уваедомления в ТЕЛЕГРАМ БОТа о старте скрипта.
 fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, DATETIME_START+ '   ' +input_var.MSG_INFO_TELEGRAM_START_BOT)
 # Формирование имени ЛОГ файла.
 LOGFILE_NAME = (input_var.BOTNAME + "_" + DATETIME_START + ".log")
+# Подключение к Binance
+CLIENT = Client(api_key, api_secret)
 
 fn_pause()
 print(LOGFILE_NAME)
