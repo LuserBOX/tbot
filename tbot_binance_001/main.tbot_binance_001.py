@@ -79,13 +79,25 @@ else:
 
 # Проверка согласованности входных параметров. index_control=0 (ERROR) или 1 (OK) , msg_control - инфо строка, сообщение о результатах проверки
 index_control, msg_control = fn_control_start_param(CLIENT, input_var.SYMBOL,input_var.TOKEN_1,BALANCE_START_TOKEN_1, input_var.TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.QNTY)
+# Если при проверке есть ошибки, выполнение прекращается с уведомлением о причине.
+if (index_control == 0):
+    fn_write_logfile_msg(LOGFILE_NAME, datetime.now(), msg_control)
+    sys.exit(msg_control)
+else:
+    fn_write_logfile_msg(LOGFILE_NAME, datetime.now(), msg_control)
+#    print(msg_control)
+# Вывод на экран стартовых параметров для подтверждения
+print('Подключение к бирже прошло успешно. Входные параметры согласованы. Проверьте входные данные. Для начала торговых операций нажмите ENTER ')
+fn_print_header (input_var.SYMBOL, input_var.TOKEN_1, input_var.TOKEN_2, BALANCE_START_TOKEN_1, BALANCE_START_TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.INTERVAL, input_var.LIMIT, input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD,input_var.QNTY)
 
-print(y)  # ('A', <class 'str'>)
-print('INDEX = ', x)  # (65, <class 'int'>)
+fn_write_logfile_msg (LOGFILE_NAME, datetime.now(), ' <INFO> Ожидание подтверждения пользователя (Press the <ENTER> key to continue...) на начало торговых операций')
 
-print(LOGFILE_NAME)
-print('Подключение к бирже прошло успешно. Входные параметры согласованы. Проверьте входные данные. Для начала торгов нажмите ENTER ')
+
 fn_pause()
+# ====== ОШИБОК НЕТ. Продолжаем выполнение =========
+
+
+
 
 
 
