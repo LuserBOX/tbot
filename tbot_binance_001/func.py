@@ -1,5 +1,8 @@
+
 import  requests
-from binance.client import Client
+import input_var
+import config_var
+
 
 def fn_print_header (simbol, balance_start_token1, balance_start_token2, price, interval, limit, rsi_min, rsi_max, rsi_period, qnty):
     print('Trading BOT: binance-rsi-001 STARTING....\n\n', 'BOT parameters:\n', '---------------------\n', \
@@ -44,7 +47,15 @@ def fn_print_current_status (bot_status, interval, limit, rsi_min, rsi_max, rsi_
            'STATUS               : ', current_order, '\n', \
            'buy: ', buy, 'sell: ', sell)
 
-def fn_create_logfile (logfile_name, datetime_now, botname, symbol, token_1, balance_start_token1, token_2, balance_start_token2 ,interval, limit, rsi_min, rsi_max, rsi_period, qnty ):
+def fn_create_logfile (logfile_name, datetime_now, botname, symbol, interval, limit, rsi_min, rsi_max, rsi_period, qnty ):
+    file = open(logfile_name,"w")
+    file.write(datetime_now.strftime("%m.%d.%Y, %H:%M:%S"))
+    file.write(' <START> '+botname+' ; '+symbol+ ' ; QNTY='+str(qnty)+' ; INTERVAL='+str(interval)+' ; LIMIT='+str(limit))
+    file.write(' ; RSI_MIN='+str(rsi_min)+' ; '+'RSI_MAX='+str(rsi_max)+' ; '+'RSI_PERIOD='+str(rsi_period) )
+    file.write('\n')
+    file.close()
+
+def fn_write_logfile_status (logfile_name, datetime_now, botname, symbol, token_1, balance_start_token1, token_2, balance_start_token2 ,interval, limit, rsi_min, rsi_max, rsi_period, qnty ):
     balance_start_token_1_float = float(balance_start_token1['free'])
     balance_start_token_2_float = float(balance_start_token2['free'])
     file = open(logfile_name,"w")
@@ -87,6 +98,15 @@ def fn_write_logfile_order_sell (logfile_name, datetime_now, botname, rsi, symbo
     file.write('\n')
     file.close()
 
+# Функция записи сообщения в LOG файл
+def fn_write_logfile_msg (logfile_name, datetime_now, msg):
+    file = open(logfile_name, "a")
+    file.write(datetime_now.strftime("%m.%d.%Y, %H:%M:%S"))
+    file.write(msg)
+    file.write('\n')
+    file.close()
+
+
 def fn_top_coin(pd, client):
         all_tickers = pd.DataFrame(client.get_ticker())
         usdt = all_tickers[all_tickers.symbol.str.contains('USDT')]
@@ -116,8 +136,31 @@ def fn_get_balance(client, token):
     balance = client.get_asset_balance(asset=token)
     balance = float((f"{balance['free']}"))
     return balance
-# Функция возвращает кол-во заюлокированных (находящиеся в открытых ордерах) токенов.
+# Функция возвращает кол-во заблокированных (находящиеся в открытых ордерах) токенов.
 def fn_get_balance_locked(client, token):
     balance_locked = client.get_asset_balance(asset=token)
     balance_locked = float((f"{balance_locked['locked']}"))
     return balance_locked
+
+# Функция контроля корректности входных параметров.
+def fn_control_start_param(client, symbol,token1, balance_start_token_1, token2, price_token2_current, qnty):
+    # Запрос информации по токену (формат- dict, вложенный список )
+    symbol_info = client.get_symbol_info(symbol)
+    # Вытаскиваем из вложенного списка, второй список с индексом 'filters'
+    symbol_info_filters = dict(symbol_info['filters'][2])
+    # Вытаскиваем значение под индексом 'minNotional'
+    symbol_info_filters_minNotional = symbol_info_filters.get('minNotional')
+    order_min_cost = float(symbol_info_filters_minNotional)
+
+    if (balance_start_token_1 == 0):          # Если нет средств на TOKEN1 - это то, за что мы покупаем ТОКЕН2
+        control_index = 0                     # control_index = 0 -при ОШИБКАХ control_index = 1 -все ОК
+        msg_control_status = '<ERROR> Торги не возможны. Начальный баланс '+ token1 + ' = 0'
+    if (price_token2_current*qnty > balance_start_token_1): # Если не хватает ТОКЕН1 для покупки указанного кол-ва ТОКЕН2
+        control_index = 0
+        msg_control_status = '<ERROR> Начального баланса ' + token1 + ' не хватает для покупки ' + str(qnty) + ' токенов '+ token2 + '. Измените входные параметры !!!'
+    if (price_token2_current*qnty < order_min_cost ):   # Если сумма сделки меньше допустимого биржей значения
+        control_index = 0
+        #                                                        приводим к строке(округляет до 2 знака
+        msg_control_status = '<ERROR> Сумма сделки составляет - '+ str(round(price_token2_current*qnty,2))+ ' '+ token1+ ', что меньше допустимого значения, равного - ' + str(order_min_cost) + ' '+ token1+'. Измените входные параметры !!!'
+
+    return control_index, msg_control_status

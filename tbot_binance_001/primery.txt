@@ -1,0 +1,16 @@
+
+
+# Проверка согласованности входных параметров.
+# ТОКЕНОВ1 хватает, чтобы купить
+
+res = CLIENT.get_symbol_info(input_var.SYMBOL)
+print(res)
+data = res.items()
+print (data)
+
+res1 = dict(res['filters'][2])
+print(res1)
+res2 = res1.get('minNotional')
+print(res2)
+res3=float(res2)
+print(res3)
