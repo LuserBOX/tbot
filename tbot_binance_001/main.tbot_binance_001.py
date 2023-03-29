@@ -49,28 +49,30 @@ try:
 except:
     print ('Ошибка создания LOF файла')
 # Отправка уваедомления в ТЕЛЕГРАМ БОТа о старте скрипта.
-fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>')+ '   ' +input_var.MSG_INFO_TELEGRAM_START_BOT)
+#fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>')+ '   ' +input_var.MSG_INFO_TELEGRAM_START_BOT)
 
 # ============ Подключение к Binance ==========
 try:
     CLIENT = Client(keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
 except:
-    fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + '   ' + config_var.msg_telegram_error_exchange_connect)
+#    fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + '   ' + config_var.msg_telegram_error_exchange_connect)
     sys.exit("Ошибка подключения к бирже. Завершение работы программы.")
 else:
-    fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + '   ' + config_var.msg_telegram_success_exchange_connect)
+#    fn_telegram_send_msg(keys.TELEGRAM_TOKEN, keys.TELEGRAM_CHAT_ID, datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + '   ' + config_var.msg_telegram_success_exchange_connect)
     fn_write_logfile_msg(LOGFILE_NAME, datetime.now(), ' <OK> Подключение к бирже прошло успешно')
 
 # Запрос информации по нашей торговой паре: балансы, в том числе заблокированные, минимальный размер ордера
 try:
-    BALANCE_START_TOKEN_1 = fn_get_balance(CLIENT, input_var.TOKEN_1)
-    BALANCE_START_TOKEN_2 = fn_get_balance(CLIENT, input_var.TOKEN_2)
-    BALANCE_LOCKED_START_TOKEN_1 = fn_get_balance_locked(CLIENT, input_var.TOKEN_1)
-    BALANCE_LOCKED_START_TOKEN_2 = fn_get_balance_locked(CLIENT, input_var.TOKEN_2)
+    BALANCE_START_TOKEN_1, BALANCE_LOCKED_START_TOKEN_1 = fn_get_balance(CLIENT, input_var.TOKEN_1)
+    BALANCE_START_TOKEN_2, BALANCE_LOCKED_START_TOKEN_2 = fn_get_balance(CLIENT, input_var.TOKEN_2)
+ #   BALANCE_LOCKED_START_TOKEN_1 = fn_get_balance_locked(CLIENT, input_var.TOKEN_1)
+ #   BALANCE_LOCKED_START_TOKEN_2 = fn_get_balance_locked(CLIENT, input_var.TOKEN_2)
     # Запрос текущей цены ТОКЕНА2
     PRICE_TOKEN2_CURRENT=fn_get_price(input_var.SYMBOL,input_var.URL)
-    print('Баланс токена 1', BALANCE_START_TOKEN_1)
-    print('Баланс токена 2', BALANCE_START_TOKEN_2)
+    print('Баланс токена 1 free', BALANCE_START_TOKEN_1)
+    print('Баланс токена 1 locked', BALANCE_LOCKED_START_TOKEN_1)
+    print('Баланс токена 2 free', BALANCE_START_TOKEN_2)
+    print('Баланс токена 2 locked', BALANCE_LOCKED_START_TOKEN_2)
     print('Цена Токена 2',PRICE_TOKEN2_CURRENT )
 
 except:
@@ -83,6 +85,10 @@ else:
 
 # Проверка согласованности входных параметров. index_control=0 (ERROR) или 1 (OK) , msg_control - инфо строка, сообщение о результатах проверки
 index_control, msg_control = fn_control_start_param(CLIENT, input_var.SYMBOL,input_var.TOKEN_1,BALANCE_START_TOKEN_1, input_var.TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.QNTY)
+# =============== Временное отключение проверки, для написания дальнейшего кода
+index_control = 1
+msg_control = ' <OK> Проверка входных параметров выполнена успешно. = ПРОВЕРКА ОТКЛЮЧЕНА!!!'
+#================================================================================
 # Если при проверке есть ошибки, выполнение прекращается с уведомлением о причине.
 if (index_control == 0):
     fn_write_logfile_msg(LOGFILE_NAME, datetime.now(), msg_control)
@@ -92,13 +98,16 @@ else:
 #    print(msg_control)
 # Вывод на экран стартовых параметров для подтверждения
 print('Подключение к бирже прошло успешно. Входные параметры согласованы. Проверьте входные данные. Для начала торговых операций нажмите ENTER ')
-fn_print_header (input_var.SYMBOL, input_var.TOKEN_1, input_var.TOKEN_2, BALANCE_START_TOKEN_1, BALANCE_START_TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.INTERVAL, input_var.LIMIT, input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD,input_var.QNTY)
+fn_print_header (input_var.SYMBOL, input_var.TOKEN_1, input_var.TOKEN_2, BALANCE_START_TOKEN_1, BALANCE_LOCKED_START_TOKEN_1,\
+                 BALANCE_START_TOKEN_2, BALANCE_LOCKED_START_TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.INTERVAL, input_var.LIMIT,\
+                 input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD,input_var.QNTY)
 
 fn_write_logfile_msg (LOGFILE_NAME, datetime.now(), ' <INFO> Ожидание подтверждения пользователя (Press the <ENTER> key to continue...) на начало торговых операций')
 
 
+
 fn_pause()
-# ====== ОШИБОК НЕТ. Продолжаем выполнение =========
+# ====== ЕСЛИ ОШИБОК НЕТ. Продолжаем выполнение =========
 
 
 

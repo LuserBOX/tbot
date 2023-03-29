@@ -2,22 +2,33 @@
 import  requests
 import input_var
 import config_var
+from colorama import init, Fore
+from colorama import Back
+from colorama import Style
+init(autoreset=True)
 
 
-def fn_print_header (simbol, token_1, token_2, balance_start_token1, balance_start_token2, price_token2_current, interval, limit, rsi_min, rsi_max, rsi_period, qnty):
-    print('Trading BOT: binance-rsi-001 STARTING....\n\n', 'ПРОВЕРЬТЕ СТАРТОВЫЕ ПАРАМЕТРЫ:\n', '==========================================\n', \
+def fn_print_header (simbol, token_1, token_2, balance_start_token1, balance_start_locked_token1, balance_start_token2, balance_start_locked_token2,price_token2_current, interval, limit, rsi_min, rsi_max, rsi_period, qnty):
+    print('Trading BOT: binance-rsi-001 STARTING....\n\n', Fore.RED +'  ПЕРЕД ЗАПУСКОМ ПЕРЕПРОВЕРЬТЕ ПАРАМЕТРЫ:')
+    print(Fore.GREEN + \
+          '============ ИНФОРМАЦИЯ О БАЛАНСЕ==========\n', \
           'Торговая пара           :', simbol, '\n', \
-          'Баланс', token_1, '             :', balance_start_token1, '\n', \
-          'Баланс', token_2, '             :', balance_start_token2, '\n', \
-          'Цена 1', token_2, '             :', price_token2_current, token_1, '\n',\
-          'Interval                :', interval, '\n', \
+          'Баланс       ', token_1, '      :', Fore.LIGHTYELLOW_EX + str(balance_start_token1), '\n', \
+          'Заблокировано', token_1, '      :', Fore.MAGENTA + str(balance_start_locked_token1), '\n', \
+          'Баланс       ', token_2, '      :', Fore.LIGHTYELLOW_EX + str(balance_start_token2), '\n', \
+          'Заблокировано', token_2, '      :', Fore.MAGENTA + str(balance_start_locked_token2), '\n', Fore.GREEN +\
+          '============ НАСТРОЙКИ ОРДЕРА =============\n', \
+          'Ордер на покупку        :', qnty, token_2, '\n', \
+          'Текущая цена 1', token_2, '     :', price_token2_current, token_1, '\n', \
+          'Текущая стоиомть ордера :', round(price_token2_current * qnty, 2), token_1, '\n', Fore.GREEN +\
+          '============ НАСТРОЙКИ ИНДИКАТОРОВ=========\n', \
+          'TimeLine раб.облачти    :', interval, '\n', \
           'RSI Limit               :', limit, '\n', \
-          'Расчетный размер ордера :', round(price_token2_current*qnty,2), token_1,'\n',\
           'RSI Period              :', rsi_period, '\n', \
           'RSI Min                 :', rsi_min, '\n',\
           'RSI Max                 :', rsi_max, '\n',\
-          'Quantity                :', qnty, '\n',\
-          '==============================================','\n',\
+          'Quantity                :', qnty, '\n',Fore.GREEN +\
+          '===========================================','\n',Fore.LIGHTWHITE_EX +\
           'ДЛЯ НАЧАЛА ТОРГОВЫХ ОПЕРАЦИЯ НАЖМИТЕ <ENTER> ....')
 
 def fn_print_current_status (bot_status, interval, limit, rsi_min, rsi_max, rsi_period, qnty, price_diff, datetime_start, date_time, \
@@ -136,11 +147,12 @@ def fn_get_price(symbol, url):
     price = float((f"{data['price']}"))
     return price
 
-# Функция возвращает свободный баланс токена.
+# Функция возвращает свободный баланс и заблокированный баланс (в открытых ордерах) токена
 def fn_get_balance(client, token):
     balance = client.get_asset_balance(asset=token)
-    balance = float((f"{balance['free']}"))
-    return balance
+    balance_free = float((f"{balance['free']}"))
+    balance_locked = float((f"{balance['locked']}"))
+    return balance_free, balance_locked
 # Функция возвращает кол-во заблокированных (находящиеся в открытых ордерах) токенов.
 def fn_get_balance_locked(client, token):
     balance_locked = client.get_asset_balance(asset=token)
@@ -158,10 +170,9 @@ def fn_control_start_param(client, symbol,token1, balance_start_token_1, token2,
     symbol_info_filters_minNotional = symbol_info_filters.get('minNotional')
     order_min_cost = float(symbol_info_filters_minNotional)
 
-    print (price_token2_current)
-    print (price_token2_current*qnty)
-    print (balance_start_token_1)
-
+#    print (price_token2_current)
+#    print (price_token2_current*qnty)
+#    print (balance_start_token_1)
 
     if (balance_start_token_1 == 0):          # Если нет средств на TOKEN1 - это то, за что мы покупаем ТОКЕН2
         control_index = 0                     # control_index = 0 -при ОШИБКАХ control_index = 1 -все ОК
@@ -171,13 +182,12 @@ def fn_control_start_param(client, symbol,token1, balance_start_token_1, token2,
         msg_control_status = ' <ERROR> ОШИБКА ВХОДНЫХ ПАРАМЕТРОВ. Начального баланса ' + token1 +' = ' +str(balance_start_token_1) + ' не хватает для покупки ' + str(qnty) + ' токенов '+ token2 + ' За имеющийся баланс можно купить только ' + str(round(balance_start_token_1/price_token2_current,2)) + ' ' +token2
     elif (price_token2_current*qnty < order_min_cost ):   # Если сумма сделки меньше допустимого биржей значения
         control_index = 0
-        #                                                        приводим к строке(округляет до 2 знака
+        #                                                      приводим к строке(округляет до 2 знака
         msg_control_status = ' <ERROR> Сумма сделки составляет - '+ str(round(price_token2_current*qnty,2))+ ' '+ token1+ ', что меньше допустимого значения, равного - ' + str(order_min_cost) + ' '+ token1+'. Измените входные параметры !!!'
 
     else:
         control_index = 1
         msg_control_status = ' <OK> Проверка входных параметров выполнена успешно. Расчетная сумма сделки составляет - ' + str(round(price_token2_current*qnty,2)) + ' '+token1
-
     return control_index, msg_control_status
 
 
