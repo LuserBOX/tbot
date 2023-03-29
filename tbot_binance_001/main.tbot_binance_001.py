@@ -69,6 +69,10 @@ try:
     BALANCE_LOCKED_START_TOKEN_2 = fn_get_balance_locked(CLIENT, input_var.TOKEN_2)
     # Запрос текущей цены ТОКЕНА2
     PRICE_TOKEN2_CURRENT=fn_get_price(input_var.SYMBOL,input_var.URL)
+    print('Баланс токена 1', BALANCE_START_TOKEN_1)
+    print('Баланс токена 2', BALANCE_START_TOKEN_2)
+    print('Цена Токена 2',PRICE_TOKEN2_CURRENT )
+
 except:
     fn_write_logfile_msg(LOGFILE_NAME, datetime.now(), ' <ERROR> Ошибка при запросе Баланса токенов и цены')
     print ('<ERROR> Ошибка запроса баланса и стоимости ТОКЕН2 ')
