@@ -1,31 +1,28 @@
 import input_var
-import config_var
 import keys
 from binance.client import Client
-#from input_var import SYMBOL, INTERVAL, LIMIT, QNTY, URL, RSI_MIN, RSI_MAX, RSI_PERIOD, BOTNAME, EXCHANGE_COMISSION, PRICE_DIFF, TOKEN_1, TOKEN_2
-from func import fn_print_header, fn_print_current_status, fn_create_logfile, fn_write_logfile_order_buy,fn_write_logfile_order_sell, fn_top_coin
-from func import fn_telegram_send_msg, fn_pause, fn_get_price, fn_get_balance, fn_get_balance_locked, fn_write_logfile_msg, fn_control_start_param
+import talib
+#from input_var import SYMBOL, INTERVAL, RSI_LIMIT, QNTY, URL, RSI_MIN, RSI_MAX, RSI_PERIOD, BOTNAME, EXCHANGE_COMISSION, PRICE_DIFF, TOKEN_1, TOKEN_2
+
+from func import  fn_create_logfile
+from func import fn_pause, fn_write_logfile_msg
+from fn_print import fn_print_header, fn_print_current_status
+from fn_trade import fn_get_balance, fn_get_price, fn_control_start_param, fn_get_data
 from datetime import datetime
 import sys
-from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
-import pandas as pd
-import asyncio
-import talib
-import time
 
-import requests
-import json
-import numpy as np
 import os
 
 # Определение глобальных переменных:
-# BALANCE_START_TOKEN_1 = 0     # Баланс ТОКЕНА_1 на момент запуска скрипта
-# BALANCE_START_TOKEN_2 = 0     # Баланс ТОКЕНА_2 на момент запуска скрипта
+
+# BALANCE_START_TOKEN_1         # Баланс ТОКЕНА_1 на момент запуска скрипта
+# BALANCE_START_TOKEN_2         # Баланс ТОКЕНА_2 на момент запуска скрипта
 # BALANCE_LOCKED_START_TOKEN_1  # Баланс заблокированных ТОКЕНОВ_1 на момент запуска скрипта
 # BALANCE_LOCKED_START_TOKEN_2  # Баланс заблокированных ТОКЕНОВ_2 на момент запуска скрипт
-BALANCE_CURRENT_TOKEN_1 = 0   # Актуальный (текущий) баланс ТОКЕНА_1
-BALANCE_CURRENT_TOKEN_2 = 0   # Актуальный (текущий) баланс ТОКЕНА_2
+# BALANCE_CURRENT_TOKEN_1         # Актуальный (текущий) баланс ТОКЕНА_1
+# BALANCE_LOCKED_CURRENT_TOKEN_1  # Актуальный баланс заблокированных в ордерах ТОКЕНОВ1
+# BALANCE_CURRENT_TOKEN_2         # Актуальный (текущий) баланс ТОКЕНА_2
+# BALANCE_LOCKED_CURRENT_TOKEN_2  # Актуальный баланс заблокированных в ордерах ТОКЕНОВ2
 PRICE_SELL = 0                #
 PRICE_SELL_MIN = 0  # Минимально допустимая цена продажи, раасчитвается как PRICE_BUY + PRICE_DIFF (%)
 PRICE_BUY = 0
@@ -39,12 +36,12 @@ CURRENT_STATUS = 0
 # LOGFILE_NAME - в переменной формируется имя лог файла.
 
 # ======================= СТАРТ СКРИПТА =====================
-DATETIME_START = datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') # Переменная сохраняет знаяение даты и времени в виде строки.
+DATETIME_START = datetime.now().strftime('%Y.%m.%d  %H:%M:%S') # Переменная сохраняет знаяение даты и времени в виде строки.
 # Формирование имени ЛОГ файла.
-LOGFILE_NAME = (input_var.BOTNAME + "_" + datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + ".log")
+LOGFILE_NAME = (input_var.DIR_LOG+input_var.BOTNAME + "_" + datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + ".log")
 # Создание LOG файла
 try:
-    fn_create_logfile(LOGFILE_NAME, datetime.now(), input_var.BOTNAME, input_var.SYMBOL, input_var.INTERVAL, input_var.LIMIT, input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD, input_var.QNTY)
+    fn_create_logfile(LOGFILE_NAME, datetime.now(), input_var.BOTNAME, input_var.SYMBOL, input_var.INTERVAL, input_var.RSI_LIMIT, input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD, input_var.QNTY)
     print('Лог файл создан: '+ LOGFILE_NAME)
 except:
     print ('Ошибка создания LOF файла')
@@ -65,15 +62,14 @@ else:
 try:
     BALANCE_START_TOKEN_1, BALANCE_LOCKED_START_TOKEN_1 = fn_get_balance(CLIENT, input_var.TOKEN_1)
     BALANCE_START_TOKEN_2, BALANCE_LOCKED_START_TOKEN_2 = fn_get_balance(CLIENT, input_var.TOKEN_2)
- #   BALANCE_LOCKED_START_TOKEN_1 = fn_get_balance_locked(CLIENT, input_var.TOKEN_1)
- #   BALANCE_LOCKED_START_TOKEN_2 = fn_get_balance_locked(CLIENT, input_var.TOKEN_2)
+
     # Запрос текущей цены ТОКЕНА2
     PRICE_TOKEN2_CURRENT=fn_get_price(input_var.SYMBOL,input_var.URL)
-    print('Баланс токена 1 free', BALANCE_START_TOKEN_1)
-    print('Баланс токена 1 locked', BALANCE_LOCKED_START_TOKEN_1)
-    print('Баланс токена 2 free', BALANCE_START_TOKEN_2)
-    print('Баланс токена 2 locked', BALANCE_LOCKED_START_TOKEN_2)
-    print('Цена Токена 2',PRICE_TOKEN2_CURRENT )
+#    print('Баланс токена 1 free', BALANCE_START_TOKEN_1)
+#    print('Баланс токена 1 locked', BALANCE_LOCKED_START_TOKEN_1)
+#    print('Баланс токена 2 free', BALANCE_START_TOKEN_2)
+#    print('Баланс токена 2 locked', BALANCE_LOCKED_START_TOKEN_2)
+#    print('Цена Токена 2',PRICE_TOKEN2_CURRENT )
 
 except:
     fn_write_logfile_msg(LOGFILE_NAME, datetime.now(), ' <ERROR> Ошибка при запросе Баланса токенов и цены')
@@ -86,8 +82,8 @@ else:
 # Проверка согласованности входных параметров. index_control=0 (ERROR) или 1 (OK) , msg_control - инфо строка, сообщение о результатах проверки
 index_control, msg_control = fn_control_start_param(CLIENT, input_var.SYMBOL,input_var.TOKEN_1,BALANCE_START_TOKEN_1, input_var.TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.QNTY)
 # =============== Временное отключение проверки, для написания дальнейшего кода
-index_control = 1
-msg_control = ' <OK> Проверка входных параметров выполнена успешно. = ПРОВЕРКА ОТКЛЮЧЕНА!!!'
+#index_control = 1
+#msg_control = ' <OK> Проверка входных параметров выполнена успешно. = ПРОВЕРКА ОТКЛЮЧЕНА!!!'
 #================================================================================
 # Если при проверке есть ошибки, выполнение прекращается с уведомлением о причине.
 if (index_control == 0):
@@ -98,21 +94,53 @@ else:
 #    print(msg_control)
 # Вывод на экран стартовых параметров для подтверждения
 print('Подключение к бирже прошло успешно. Входные параметры согласованы. Проверьте входные данные. Для начала торговых операций нажмите ENTER ')
-fn_print_header (input_var.SYMBOL, input_var.TOKEN_1, input_var.TOKEN_2, BALANCE_START_TOKEN_1, BALANCE_LOCKED_START_TOKEN_1,\
-                 BALANCE_START_TOKEN_2, BALANCE_LOCKED_START_TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.INTERVAL, input_var.LIMIT,\
-                 input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD,input_var.QNTY)
+fn_print_header (input_var.SYMBOL, input_var.TOKEN_1, input_var.TOKEN_2, BALANCE_START_TOKEN_1, BALANCE_LOCKED_START_TOKEN_1, \
+                 BALANCE_START_TOKEN_2, BALANCE_LOCKED_START_TOKEN_2, PRICE_TOKEN2_CURRENT, input_var.INTERVAL, input_var.RSI_LIMIT, \
+                 input_var.RSI_MIN, input_var.RSI_MAX, input_var.RSI_PERIOD, input_var.QNTY)
 
 fn_write_logfile_msg (LOGFILE_NAME, datetime.now(), ' <INFO> Ожидание подтверждения пользователя (Press the <ENTER> key to continue...) на начало торговых операций')
 
-
-
-fn_pause()
 # ====== ЕСЛИ ОШИБОК НЕТ. Продолжаем выполнение =========
+fn_pause()
+
+def main():
+    global BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2
+    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT
+
+    # Пара индексов. Показывают состояние крипта.(buy=False и sell=True)-Ожидание покупки.(buy=True и sell=False)-Ожидание продажи.
+    buy = False
+    sell = True
+
+    while True:
+        os.system('clear')
+
+        style = "\033[7m\033[33m{}"
+        style = "\033[7m\033[33m{}"
+        print("\033[33m{}".format('ПРИВЕТ!!!'))
+        print("\033[1m\033[33m{}".format('ПРИВЕТ!!!'))
+        print(style.format("ПРИВЕТ!!!'"))
+
+        # ======= РАСЧЕТ ПАРАМЕТРОВ ДЛЯ ТОРГОВ =====
+        BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1 = fn_get_balance(CLIENT, input_var.TOKEN_1)
+        BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2 = fn_get_balance(CLIENT, input_var.TOKEN_2)
+        PRICE_TOKEN_2_CURRENT = fn_get_price(input_var.SYMBOL, input_var.URL)
+
+
+        closing_data = fn_get_data(input_var.URL_BINANCE_GET_CANDLES_INTERVAL_LIMIT, input_var.SYMBOL, input_var.INTERVAL, input_var.RSI_LIMIT)
+        RSI_CURRENT = talib.RSI(closing_data, input_var.RSI_PERIOD)[-1]
 
 
 
+        fn_print_current_status(DATETIME_START, BALANCE_START_TOKEN_1, BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1,\
+                                BALANCE_START_TOKEN_2, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2, PRICE_TOKEN_2_CURRENT, 85)
 
 
 
+        fn_pause()
 
+
+
+if __name__ == '__main__':
+
+    main()
 
