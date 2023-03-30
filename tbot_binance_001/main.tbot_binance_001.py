@@ -28,7 +28,7 @@ PRICE_SELL_MIN = 0  # Минимально допустимая цена про�
 PRICE_BUY = 0
 PRICE_DIFF_CURRENT = 0
 # PRICE_TOKEN2_CURRENT - Текущая цена токена
-PRICE_START = 0
+# PRICE_START_TOKEN_2  - Цена ТОКЕН2 на момент старта
 CURRENT_ORDER = 'Ордеров не было'
 # До первого ордера = 0, Купил, дждет продажу = 1, Продал, ждет покупку = -1
 CURRENT_STATUS = 0
@@ -36,6 +36,22 @@ CURRENT_STATUS = 0
 # LOGFILE_NAME - в переменной формируется имя лог файла.
 
 # ======================= СТАРТ СКРИПТА =====================
+
+
+style = "\033[7m\033[33m{}"
+style = "\033[7m\033[33m{}"
+print("\033[31m{}".format('1 ПРИВЕТ!!!'))
+print("\033[1m\033[31m{}".format('2 ПРИВЕТ!!!'))
+print("\033[31m\033[1m{}".format('2 ПРИВЕТ!!!'))
+print("\033[0m\033[33m{}".format('3 ПРИВЕТ!!!'))
+print("\033[1m\033[33m{}".format('4 ПРИВЕТ!!!'))
+print("\033[1m\033[39m{}".format("5 ПРИВЕТ!!!"))
+print("\033[1m\033[37m{}".format('6 ПРИВЕТ!!!'))
+print("\033[1m\033[37m{}".format('7 ПРИВЕТ!!!'))
+print("\033[2m\033[37m{}".format('8 ПРИВЕТ!!!'))
+
+fn_pause()
+
 DATETIME_START = datetime.now().strftime('%Y.%m.%d  %H:%M:%S') # Переменная сохраняет знаяение даты и времени в виде строки.
 # Формирование имени ЛОГ файла.
 LOGFILE_NAME = (input_var.DIR_LOG+input_var.BOTNAME + "_" + datetime.now().strftime('<%Y.%m.%d  %H:%M:%S>') + ".log")
@@ -105,7 +121,10 @@ fn_pause()
 
 def main():
     global BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2
-    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT
+    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT, PRICE_START_TOKEN_2
+
+    PRICE_START_TOKEN_2 = fn_get_price(input_var.SYMBOL,input_var.URL)
+
 
     # Пара индексов. Показывают состояние крипта.(buy=False и sell=True)-Ожидание покупки.(buy=True и sell=False)-Ожидание продажи.
     buy = False
@@ -114,11 +133,12 @@ def main():
     while True:
         os.system('clear')
 
-        style = "\033[7m\033[33m{}"
-        style = "\033[7m\033[33m{}"
-        print("\033[33m{}".format('ПРИВЕТ!!!'))
-        print("\033[1m\033[33m{}".format('ПРИВЕТ!!!'))
-        print(style.format("ПРИВЕТ!!!'"))
+        if (buy == False and sell == True):
+            MSG_ORDER_STATUS = 'ОЖИДАНИЕ УСЛОВИЙ ДЛЯ ПОКУПКИ'
+        else:
+            MSG_ORDER_STATUS = 'ОЖИДАНИЕ УСЛОВИЙ ДЛЯ ПРОДАЖИ'
+
+
 
         # ======= РАСЧЕТ ПАРАМЕТРОВ ДЛЯ ТОРГОВ =====
         BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1 = fn_get_balance(CLIENT, input_var.TOKEN_1)
@@ -132,7 +152,7 @@ def main():
 
 
         fn_print_current_status(DATETIME_START, BALANCE_START_TOKEN_1, BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1,\
-                                BALANCE_START_TOKEN_2, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2, PRICE_TOKEN_2_CURRENT, 85)
+                                BALANCE_START_TOKEN_2, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2, PRICE_START_TOKEN_2,PRICE_TOKEN_2_CURRENT, RSI_CURRENT, MSG_ORDER_STATUS)
 
 
 

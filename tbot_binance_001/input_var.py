@@ -7,7 +7,7 @@ TOKEN_1 = 'BNB'
 # Этот токен мы продаем и на его курсе пытаемся заработать.
 TOKEN_2 = 'LTC'
 # Параметр TimeFrame. Set this timeframe on Binance TradingView Window for correct inspectors bot work
-INTERVAL = '1m'
+INTERVAL = '15m'
 # Параметр отвечает за расчет индекса RSI
 RSI_LIMIT = '200'
 # Параметр указывает, какое кол-во ТОКЕНА_2 мы покупаем, для дальнейшей продажи.

@@ -35,17 +35,39 @@ def fn_print_header (simbol, token_1, token_2, balance_start_token1, balance_sta
           'ДЛЯ НАЧАЛА ТОРГОВЫХ ОПЕРАЦИЯ НАЖМИТЕ <ENTER> ....')
 
 def fn_print_current_status (datetime_start, balance_start_token_1_float, balance_current_token_1_float, balance_locked_token_1,
-                             balance_start_token_2_float, balance_current_token_2_float, balance_locked_token_2, price_current_token_2, rsi_current ):
-
-
-
-
-    #balance_start_token_1_float = float(balance_start_token_1_float['free'])
+                             balance_start_token_2_float, balance_current_token_2_float, balance_locked_token_2, price_start_token_2, price_current_token_2, rsi_current, msg_status ):
     rsi_zero = 50
     rsi_up_1_3 = rsi_zero + (input_var.RSI_MAX - rsi_zero)/3
     rsi_up_2_3 = rsi_zero + 2*(input_var.RSI_MAX - rsi_zero) / 3
     rsi_down_1_3 = rsi_zero - (rsi_zero - input_var.RSI_MIN) / 3
     rsi_down_2_3 = rsi_zero - 2*(rsi_zero - input_var.RSI_MIN) / 3
+
+    balance_diff_token_1 = balance_current_token_1_float - balance_start_token_1_float + balance_locked_token_1
+    balance_diff_token_2 = balance_current_token_2_float - balance_start_token_2_float + balance_locked_token_2
+
+    color_wite = "\033[1m\033[39m{}"
+    color_yellow = "\033[0m\033[33m{}"
+    color_yellow_bold = "\033[1m\033[33m{}"
+    color_red = "\033[1m\033[31m{}"
+
+    if(rsi_current > input_var.RSI_MAX):
+        rsi_current_color = color_red
+    elif(rsi_current < input_var.RSI_MIN):
+        rsi_current_color = color_red
+    elif(rsi_current > rsi_up_1_3 and rsi_current < rsi_up_2_3):
+        rsi_current_color = color_yellow
+    elif(rsi_current < rsi_down_1_3 and rsi_current > rsi_down_2_3):
+        rsi_current_color = color_yellow
+    elif(rsi_current > input_var.RSI_MIN and rsi_current < rsi_down_2_3):
+        rsi_current_color = color_yellow_bold
+    elif(rsi_current < input_var.RSI_MAX and rsi_current > rsi_up_1_3):
+        rsi_current_color = color_yellow_bold
+    else:
+        rsi_current_color = color_wite
+
+
+
+
 
     print(rsi_up_1_3 , rsi_up_2_3, rsi_down_1_3, rsi_down_2_3)
 
@@ -61,12 +83,16 @@ def fn_print_current_status (datetime_start, balance_start_token_1_float, balanc
     print(Fore.GREEN + \
           '============ ИНФОРМАЦИЯ О БАЛАНСЕ==========\n', \
           'Торговая пара                 :', Fore.BLUE + input_var.SYMBOL, '\n', \
-          'Стартовый баланс ', input_var.TOKEN_1, '        :', Fore.LIGHTYELLOW_EX + str(balance_start_token_1_float), '\n', \
-          'Текущий баланс ', input_var.TOKEN_1, '          :', Fore.LIGHTGREEN_EX + str(balance_current_token_1_float), '\n', \
-          'Заблокировано', input_var.TOKEN_1, '            :', Fore.LIGHTRED_EX + str(balance_locked_token_1), '\n', \
-          'Стартовый баланс ', input_var.TOKEN_2, '        :', Fore.YELLOW + str(balance_start_token_2_float), '\n', \
-          'Текущий баланс ', input_var.TOKEN_2, '          :', Fore.LIGHTGREEN_EX + str(balance_current_token_2_float), '\n', \
-          'Заблокировано', input_var.TOKEN_2, '            :', Fore.LIGHTRED_EX + str(balance_locked_token_2))
+          '-----------------', input_var.TOKEN_1,'--------------------\n', \
+          'Стартовый баланс              :', Fore.LIGHTYELLOW_EX + str(balance_start_token_1_float), '\n', \
+          'Текущий баланс                :', Fore.LIGHTGREEN_EX + str(balance_current_token_1_float), '\n', \
+          'Заблокировано                 :', Fore.LIGHTRED_EX + str(balance_locked_token_1), '\n', \
+          'РЕЗУЛЬТАТ:                    :', Fore.LIGHTWHITE_EX + str(balance_diff_token_1), '\n', \
+          '-----------------', input_var.TOKEN_2,'--------------------\n', \
+          'Стартовый баланс              :', Fore.LIGHTYELLOW_EX + str(balance_start_token_2_float), '\n', \
+          'Текущий баланс                :', Fore.LIGHTGREEN_EX + str(balance_current_token_2_float), '\n', \
+          'Заблокировано                 :', Fore.LIGHTRED_EX + str(balance_locked_token_2), '\n'\
+          ' РЕЗУЛЬТАТ:                    :', Fore.LIGHTWHITE_EX + str(balance_diff_token_2))
 
     print(Fore.GREEN + \
           '================ ИНДИКАТОРЫ ================\n', \
@@ -75,33 +101,20 @@ def fn_print_current_status (datetime_start, balance_start_token_1_float, balanc
           'RSI Period                    :', input_var.RSI_PERIOD, '\n',\
           'RSI min                       :', input_var.RSI_MIN, '\n',\
           'RSI max                       :', input_var.RSI_MAX)
-    # RSI Выше RSI_MAX. Сигнал на продажу. КРАСНЫМ.
-    if (rsi_current > input_var.RSI_MAX):
-          print(' RSI Текущий                   :', Fore.RED + str(round(rsi_current,input_var.RSI_CURRENT_ROUND)))
-          # Если RSI выше RSI_ZERO в средней зоне. ЖЕЛТАЯ
-    elif(rsi_current > rsi_up_1_3 and rsi_current < rsi_up_2_3):
-        print(' RSI Текущий                   :', Fore.YELLOW + str(round(rsi_current, input_var.RSI_CURRENT_ROUND)))
-        # Если RSI ниже RSI_ZERO в средней зоне. ЖЕЛТАЯ
-    elif(rsi_current < rsi_down_1_3 and rsi_current > rsi_down_2_3):
-        print(' RSI Текущий                   :', Fore.YELLOW + str(round(rsi_current, input_var.RSI_CURRENT_ROUND)))
-        # RSI менье RSI_ZERO в нижней зоне
-    elif(rsi_current > input_var.RSI_MIN and rsi_current < rsi_down_2_3):
-        print(' RSI Текущий                   :', Fore.LIGHTYELLOW_EX + str(round(rsi_current, input_var.RSI_CURRENT_ROUND)))
-        # RSI выше RSI_ZERO в верхней зоне, но до MAX
-    elif(rsi_current < input_var.RSI_MAX and rsi_current > rsi_up_1_3):
-        print(' RSI Текущий                   :', Fore.LIGHTYELLOW_EX + str(round(rsi_current, input_var.RSI_CURRENT_ROUND)))
-        # RSI меньше MIN. Сигнал на покупку.
-    elif(rsi_current < input_var.RSI_MIN):
-          print(' RSI Текущий                   :', Fore.RED + str(round(rsi_current, input_var.RSI_CURRENT_ROUND)))
-          # Во всех остальных случаях БЕЛЫЙ
-    else:
-          print(' RSI Текущий                   :', Fore.LIGHTWHITE_EX + str(round(rsi_current, input_var.RSI_CURRENT_ROUND)))
+    print(' RSI Текущий                   :', rsi_current_color.format(str(round(rsi_current, input_var.RSI_CURRENT_ROUND))))
+
 
     print(Fore.GREEN + \
           '=========== ИНФОРМАЦИЯ ПО ОРДЕРУ ===========\n', \
-          'Ордер на покупку        :', input_var.QNTY, input_var.TOKEN_2, '\n', \
-          'Текущая цена 1', input_var.TOKEN_2, '     :', price_current_token_2, input_var.TOKEN_1, '\n', \
-          'Текущая стоиомть ордера :', round(price_current_token_2 * input_var.QNTY,input_var.PRICE_ORDER_ROUND), input_var.TOKEN_1)
+          'СТАТУС ОРДЕРА                 :', msg_status, '\n', \
+
+
+
+          'Покупаем/Продаем              :', input_var.QNTY, input_var.TOKEN_2, '\n', \
+          'Минимальный навар             :', input_var.PRICE_DIFF, '%\n', \
+          'Цена 1', input_var.TOKEN_2, 'на момент старта   :', price_start_token_2, input_var.TOKEN_1, '\n', \
+          'Текущая цена 1', input_var.TOKEN_2, '           :', price_current_token_2, input_var.TOKEN_1, '\n', \
+          'Текущая стоимость ордера      :', round(price_current_token_2 * input_var.QNTY,input_var.PRICE_ORDER_ROUND), input_var.TOKEN_1)
 
 '''         
           
