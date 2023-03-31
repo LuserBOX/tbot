@@ -78,29 +78,59 @@ def fn_control_start_param(client, symbol,token1, balance_start_token_1, token2,
 def fn_place_order(order_type, client):
     CLIENT = Client(keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET, testnet=True)
     print('Функция формирования ордера ЗАПУЩЕНА')
+    current_datetime = datetime.now()
     if(order_type == 'BUY'):
-        # Попытка размещения ордера на покупку
-        try:
-            print('Попытка размещения ордера на ПОКУПКУ')
-            order = CLIENT.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
-        except:
-            print('ОШИБКА размещения ордера на ПОКУПКУ')
-            sys.exit("ОШИБКА размещения ордера на ПОКУПКУ")
-        else:
-            print(order, 'Размещение ордера на ПОКУПКУ прошло УСПЕШНО')
+        # Попытка размещения ТЕСТОВОГО ордера на ПОКУПКУ
+        print('Размещаем ордер на ПОКУПКУ')
 
+
+        order = CLIENT.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
+        print ()
+        print(order, 'Размещение ордера на ПОКУПКУ прошло УСПЕШНО')
+        '''
+        try:
+            order_test = client.create_test_order(symbol = input_var.SYMBOL, side=order_type, type = 'MARKET', quantity=input_var.QNTY)
+            #print(order_test, 'Попытка размещения ТЕСТОВОГО ордера на ПОКУПКУ')
+        except:
+            #print(order_test, 'ОШИБКА размещения ТЕСТОВОГО ордера на ПОКУПКУ')
+            sys.exit("ОШИБКА размещения ТЕСТОВОГО ордера на ПОКУПКУ")
+        else:
+            print(order_test, 'Размещение ТЕСТОВОГО ордера на ПОКУПКУ прошло УСПЕШНО')
+            print('Размещаем ордер на ПОКУПКУ')
+            # Попытка размещения БОЕВОГО ордера на ПРОДАЖУ
+            try:
+                order = client.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
+            except:
+            #    print(order, 'ОШИБКА размещения ордера на ПОКУПКУ')
+                sys.exit("ОШИБКА размещения ордера на ПОКУПКУ")
+            else:
+                print(order, 'Размещение ордера на ПОКУПКУ прошло УСПЕШНО')
+        '''
     if(order_type == 'SELL'):
         print('Размещаем ордер на ПРОДАЖУ')
-            # Попытка размещения  ордера на ПРОДАЖУ
+        order = CLIENT.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
+        print(order, 'Размещение ордера на ПРОДАЖУ прошло УСПЕШНО')
+        '''
+        # Попытка размещения ТЕСТОВОГО ордера на ПРОДАЖУ
         try:
-            print('Попытка размещения ордера на ПРОДАЖУ')
-            order = CLIENT.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
-        except:
-            print('ОШИБКА размещения ордера на ПРОДАЖУ')
-            sys.exit("ОШИБКА размещения ордера на ПРОДАЖУ")
-        else:
-            print(order, 'Размещение ордера на ПРОДАЖУ прошло УСПЕШНО')
 
+            order_test = client.create_test_order(symbol = input_var.SYMBOL, side=order_type, type = 'MARKET', quantity=input_var.QNTY)
+            #print(order_test, 'Попытка размещения ТЕСТОВОГО ордера на ПОКУПКУ')
+        except:
+            #print(order_test, 'ОШИБКА размещения ТЕСТОВОГО ордера на ПОКУПКУ')
+            sys.exit("ОШИБКА размещения ТЕСТОВОГО ордера на ПРОДАЖУ")
+        else:
+            print(order_test, 'Размещение ТЕСТОВОГО ордера на ПРОДАЖУ прошло УСПЕШНО')
+            print('Размещаем ордер на ПРОДАЖУ')
+            # Попытка размещения БОЕВОГО ордера на ПРОДАЖУ
+            try:
+                order = client.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
+            except:
+            #    print(order, 'ОШИБКА размещения ордера на ПОКУПКУ')
+                sys.exit("ОШИБКА размещения ордера на ПРОДАЖУ")
+            else:
+                print(order, 'Размещение ордера на ПРОДАЖУ прошло УСПЕШНО')
+        '''
     print('Функция формирования ордера ОТРАБОТАЛА')
 
     fn_pause()

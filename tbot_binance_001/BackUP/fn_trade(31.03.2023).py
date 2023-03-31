@@ -1,12 +1,7 @@
 import requests
 import numpy as np
-import sys
-import keys
 from datetime import datetime
 from func import fn_pause
-from binance.client import Client
-from tbot_binance_001 import input_var
-
 
 # Функция возвращает торговую пару, самых торгуемых в данный момент токенов.
 def fn_top_coin(pd, client):
@@ -75,33 +70,19 @@ def fn_control_start_param(client, symbol,token1, balance_start_token_1, token2,
         msg_control_status = ' <OK> Проверка входных параметров выполнена успешно. Расчетная сумма сделки составляет - ' + str(round(price_token2_current*qnty,2)) + ' '+token1
     return control_index, msg_control_status
 
-def fn_place_order(order_type, client):
-    CLIENT = Client(keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET, testnet=True)
-    print('Функция формирования ордера ЗАПУЩЕНА')
+def fn_place_order(order_type,rsi_curent):
+    current_datetime = datetime.now()
     if(order_type == 'BUY'):
-        # Попытка размещения ордера на покупку
-        try:
-            print('Попытка размещения ордера на ПОКУПКУ')
-            order = CLIENT.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
-        except:
-            print('ОШИБКА размещения ордера на ПОКУПКУ')
-            sys.exit("ОШИБКА размещения ордера на ПОКУПКУ")
-        else:
-            print(order, 'Размещение ордера на ПОКУПКУ прошло УСПЕШНО')
-
+        #order = CLIENT.create_order(symbol=SYMBOL, side=order_type, type='MARKET', quantity= QNTY)
+        #print(order, 'buy order placed')
+        #write_logfile_order_buy(LOGFILE_NAME, datetime.now(), BOTNAME, rsi, SYMBOL, QNTY, PRICE_CURRENT)
+        #print(current_datetime, '  Создан ордер на покупку. Цена покупки: $', PRICE_CURRENT)
+        #print('.......... Ожидание необходимых условий для продажи')
+        print('Отработал ордер на ПОКУПКУ')
+        print('-----------------')
     if(order_type == 'SELL'):
-        print('Размещаем ордер на ПРОДАЖУ')
-            # Попытка размещения  ордера на ПРОДАЖУ
-        try:
-            print('Попытка размещения ордера на ПРОДАЖУ')
-            order = CLIENT.create_order(symbol=input_var.SYMBOL, side=order_type, type='MARKET', quantity=input_var.QNTY)
-        except:
-            print('ОШИБКА размещения ордера на ПРОДАЖУ')
-            sys.exit("ОШИБКА размещения ордера на ПРОДАЖУ")
-        else:
-            print(order, 'Размещение ордера на ПРОДАЖУ прошло УСПЕШНО')
-
-    print('Функция формирования ордера ОТРАБОТАЛА')
+        print('Отработал ордер на ПРОДАЖУ')
+        print('-----------------')
 
     fn_pause()
 

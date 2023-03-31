@@ -1,13 +1,11 @@
 
-from colorama import init, Fore
-from colorama import Back
-from colorama import Style
+from colorama import init
+
 init(autoreset=True)
-import input_var
+from tbot_binance_001 import input_var
 import requests
-from colorama import init, Fore
-from colorama import Back
-from colorama import Style
+from colorama import init
+
 init(autoreset=True)
 b = input_var.QNTY
 
@@ -75,9 +73,6 @@ def fn_write_logfile_msg (logfile_name, datetime_now, msg):
     file.write('\n')
     file.close()
 
-
-
-
 def fn_telegram_send_msg(telegram_token, chat_id,text):
     url_req = "https://api.telegram.org/bot" + telegram_token + "/sendMessage" + "?chat_id=" + chat_id + "&text=" + text
     results = requests.get(url_req)
@@ -86,7 +81,6 @@ def fn_telegram_send_msg(telegram_token, chat_id,text):
 def fn_pause():
     programPause = input("Press the <ENTER> key to continue...")
 
-# Функция возвращает текущую цену токена в индексной паре 'symbol'. Например symbol=BNBUSDT
 
 
 
