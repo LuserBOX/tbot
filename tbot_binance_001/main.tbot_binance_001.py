@@ -1,17 +1,24 @@
 import sys
 import os
+import GLOBAL
 sys.path.append("/dll")
 import talib
+import func
+from pynput.keyboard import Key, Listener
 from tbot_binance_001 import input_var
-import keys
+#import keys
+import keys_test as keys
 from binance.client import Client
-from tbot_binance_001.func import  fn_create_logfile
+from tbot_binance_001.func import  fn_create_logfile, on_release, on_press
 from tbot_binance_001.func import fn_pause, fn_write_logfile_msg
 from tbot_binance_001.fn_print import fn_print_header, fn_print_current_status
 from tbot_binance_001.fn_trade import fn_get_balance, fn_get_price, fn_control_start_param, fn_get_data, fn_place_order
 from datetime import datetime
 import time
-import getch
+
+from pynput import keyboard
+
+
 
 PRICE_SELL = 0                #
 PRICE_SELL_MIN = 0  # Минимально допустимая цена продажи, раасчитвается как PRICE_BUY + PRICE_DIFF (%)
@@ -98,6 +105,9 @@ def main():
     global BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2
     global PRICE_TOKEN_2_CURRENT, RSI_CURRENT, PRICE_START_TOKEN_2, PRICE_BUY_TOKEN_2, KEY
 
+
+
+
     KEY = ''
 
     PRICE_START_TOKEN_2 = fn_get_price(input_var.SYMBOL, input_var.URL)
@@ -128,30 +138,60 @@ def main():
             PRICE_DIFF_CURRENT = (PRICE_TOKEN_2_CURRENT - PRICE_BUY_TOKEN_2) / PRICE_BUY_TOKEN_2 * 100
             PRICE_SELL_MIN = PRICE_BUY_TOKEN_2 + PRICE_BUY_TOKEN_2 / 100 * input_var.PRICE_DIFF
 
-
-
         # Условие для покупки токена: Только по текущему значению RSI
-        if ((RSI_CURRENT <= input_var.RSI_MIN and not buy) or KEY == 'b'):
+        if ((RSI_CURRENT <= input_var.RSI_MIN and not buy) or GLOBAL.ORDER_MANUAL_SET == 'BUY'):
             # ВЫзов функции создания ордеоа с параметром на покупку
             # Фиксируем цену закупки в глобальную переменную PRICE_BUY_TOKEN_2
+            # Сбрасываем глобальную переменную, если мы создали ордер по ней, ее нужно обнулить.
+
             PRICE_BUY_TOKEN_2 = PRICE_TOKEN_2_CURRENT
 
-            fn_place_order('BUY', RSI_CURRENT)
+            fn_place_order('BUY', RSI_CURRENT, keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
             print('buy=', buy,' sell=', sell )
+            # Переворачиваем индексы.
             buy = not buy
             sell = not sell
+
+            if (GLOBAL.ORDER_MANUAL_SET == 'BUY'):
+                GLOBAL.ORDERS_NUMBER_BUY_MANUAL = GLOBAL.ORDERS_NUMBER_BUY_MANUAL + 1
+                buy = not buy
+                sell = not sell
             print('buy=', buy,' sell=', sell )
+            GLOBAL.ORDER_MANUAL_SET = ''
+            # Увеличиваем счетчик ордеров на покупку на 1
+
+            GLOBAL.ORDERS_NUMBER_BUY = GLOBAL.ORDERS_NUMBER_BUY + 1
+            GLOBAL.ORDERS_NUMBER_BUY_AUTO = GLOBAL.ORDERS_NUMBER_BUY - GLOBAL.ORDERS_NUMBER_BUY_MANUAL
 
             #  ===========ТЕСТ=========== Условия на продажу. По текущему значению RSI
-        if ((RSI_CURRENT >= input_var.RSI_MAX and not sell) or KEY == 's'):
+        if ((RSI_CURRENT >= input_var.RSI_MAX and not sell) or GLOBAL.ORDER_MANUAL_SET == 'SELL'):
+            buy = not buy
+            sell = not sell
+            if (GLOBAL.ORDER_MANUAL_SET == 'SELL'):
+                GLOBAL.ORDERS_NUMBER_SELL_MANUAL = GLOBAL.ORDERS_NUMBER_SELL_MANUAL + 1
+                fn_pause()
+                buy = not buy
+                sell = not sell
         # ========= РОБОЧИЙ ======Условия на продажу. По текущему значению RSI и чтобы навар был не меньше фиксированного
         #if (RSI_CURRENT >= input_var.RSI_MAX and PRICE_DIFF_CURRENT >= input_var.PRICE_DIFF and not sell):
             # ВЫзов функции создания ордеоа с параметром на продажу
 
-            fn_place_order('SELL', RSI_CURRENT)
+            fn_place_order('SELL', RSI_CURRENT, keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
+            # Сбрасываем глобальную переменную, если мы создали ордер по ней, ее нужно обнулить.
+            GLOBAL.ORDER_MANUAL_SET = ''
+
             print('buy=', buy, ' sell=', sell)
-            buy = not buy
-            sell = not sell
+
+
+
+
+
+            print('buy=', buy, ' sell=', sell)
+            GLOBAL.ORDER_MANUAL_SET = ''
+            # Увеличиваем счетчик ордеров на покупку на 1
+            GLOBAL.ORDERS_NUMBER_SELL = GLOBAL.ORDERS_NUMBER_SELL + 1
+            # Расчет общего колва автоматических ордеров на продажу
+            GLOBAL.ORDERS_NUMBER_SELL_AUTO = GLOBAL.ORDERS_NUMBER_SELL - GLOBAL.ORDERS_NUMBER_SELL_MANUAL
             print('buy=', buy, ' sell=', sell)
 
         if (buy == False and sell == True):
@@ -165,16 +205,35 @@ def main():
                                 BALANCE_START_TOKEN_2, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2, PRICE_START_TOKEN_2,PRICE_TOKEN_2_CURRENT, RSI_CURRENT, MSG_ORDER_STATUS)
         print('buy=', buy, ' sell=', sell)
 
-        #KEY = getch.getch()
-
-
-
-
+        # Прослушивание и перехват нажатия кнопок
+        listener = keyboard.Listener(
+            on_press=on_press,
+            on_release=on_release)
+        listener.start()
+        # Обработка нажатых клавиш
+        if (GLOBAL.PRESS_KEY == 'b'):
+            print('GLOBAL.ORDER_MANUAL_SET => BUY')
+            GLOBAL.ORDER_MANUAL_SET = 'BUY'
+            #input_buy_char = input('СФОРМИРОВАТЬ ОРДЕР НА ПОКУПКУ? Y/n:')
+            #if (input_buy_char == 'Y'):
+            #    print('GLOBAL.ORDER_MANUAL_SET => BUY')
+            #    GLOBAL.ORDER_MANUAL_SET = 'BUY'
+            #    fn_pause()
+        if (GLOBAL.PRESS_KEY == 's'):
+            print('GLOBAL.ORDER_MANUAL_SET => SELL')
+            GLOBAL.ORDER_MANUAL_SET = 'SELL'
+            #input_buy_char = input('СФОРМИРОВАТЬ ОРДЕР НА ПРОДАЖУ? Y/n:')
+            #if (input_buy_char == 'Y'):
+            #    print('GLOBAL.ORDER_MANUAL_SET => SELL')
+            #    GLOBAL.ORDER_MANUAL_SET = 'SELL'
+            #    fn_pause()
+        if (GLOBAL.PRESS_KEY == 'q'):
+            input_buy_char = input('ЗАКОНЧИТЬ ВЫПОЛНЕНИЕ ПРОГРАММЫ? Y/n:')
+            if (input_buy_char == 'Y'):
+                sys.exit('ЗАВЕРШЕНИЕ ПРОГРАММЫ ПО ТРЕБОВАНИЮ ПОЛЬЗОВАТЕЛЯ.....')
         time.sleep(1)
 
 
-
-fn_pause()
 if __name__ == '__main__':
 
     main()

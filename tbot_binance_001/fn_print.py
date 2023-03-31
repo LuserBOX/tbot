@@ -1,5 +1,5 @@
 from colorama import init
-
+import GLOBAL
 init(autoreset=True)
 from tbot_binance_001 import input_var
 from colorama import init, Fore
@@ -89,7 +89,15 @@ def fn_print_current_status (datetime_start, balance_start_token_1_float, balanc
           'RSI min                       :', input_var.color_blue.format(input_var.RSI_MIN))
 
     print(Fore.GREEN + \
-          '=========== ИНФОРМАЦИЯ ПО ОРДЕРУ ===========\n', \
+          '============= ОРДЕРА НА ПОКУПКУ ============\n', \
+          'ОРДЕРОВ НА ПОКУПКУ ВЫПОЛНЕНО  :', GLOBAL.ORDERS_NUMBER_BUY, '\n', \
+          '             В РУЧНОМ РЕЖИМЕ  :', GLOBAL.ORDERS_NUMBER_BUY_MANUAL, '\n', \
+          '     В АВТОМАТИЧЕСКОМ РЕЖИМЕ  :', GLOBAL.ORDERS_NUMBER_BUY_AUTO, '\n', \
+          '============= ОРДЕРА НА ПРОДАЖУ ============\n', \
+          'ВСЕГО                         :', GLOBAL.ORDERS_NUMBER_SELL, '\n', \
+          'В РУЧНОМ РЕЖИМЕ               :', GLOBAL.ORDERS_NUMBER_SELL_MANUAL, '\n', \
+          'В АВТОМАТИЧЕСКОМ РЕЖИМЕ       :', GLOBAL.ORDERS_NUMBER_SELL_AUTO, '\n', \
+          '============= ТЕКУЩЕЕ СОСТОЯНИЕ ============\n', \
           'СТАТУС ОРДЕРА                 :', msg_status, '\n', \
           'Покупаем/Продаем              :', input_var.color_blue.format(input_var.QNTY), input_var.color_blue.format(input_var.TOKEN_2), '\n', \
           'Минимальный навар             :', input_var.color_blue.format(input_var.PRICE_DIFF), input_var.color_blue.format('%\n'), \

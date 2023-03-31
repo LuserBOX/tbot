@@ -1,13 +1,12 @@
-
+import GLOBAL
 from colorama import init
-
+from pynput import keyboard
 init(autoreset=True)
 from tbot_binance_001 import input_var
 import requests
 from colorama import init
 
 init(autoreset=True)
-b = input_var.QNTY
 
 def fn_create_logfile (logfile_name, datetime_now, botname, symbol, interval, rsi_limit, rsi_min, rsi_max, rsi_period, qnty):
 
@@ -81,6 +80,21 @@ def fn_telegram_send_msg(telegram_token, chat_id,text):
 def fn_pause():
     programPause = input("Press the <ENTER> key to continue...")
 
+# Функция перехвата нажатия
+def on_press(key):
+    try:
+        GLOBAL.PRESS_KEY = key.char
+    except AttributeError:
+        bb=5
+    finally:
+        key.char =''
+
+        # Функция перехвата отпускания клавиши
+def on_release(key):
+    #print(f'{key} released')
+    if key == keyboard.Key.esc:
+        # Возврат False - остановит слушатель
+        return False
 
 
 

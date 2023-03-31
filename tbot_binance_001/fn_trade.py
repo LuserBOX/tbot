@@ -75,9 +75,10 @@ def fn_control_start_param(client, symbol,token1, balance_start_token_1, token2,
         msg_control_status = ' <OK> Проверка входных параметров выполнена успешно. Расчетная сумма сделки составляет - ' + str(round(price_token2_current*qnty,2)) + ' '+token1
     return control_index, msg_control_status
 
-def fn_place_order(order_type, client):
-    CLIENT = Client(keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET, testnet=True)
+def fn_place_order(order_type, client, api_key, api_secret):
+    CLIENT = Client(api_key, api_secret, testnet=True)
     print('Функция формирования ордера ЗАПУЩЕНА')
+    fn_pause()
     if(order_type == 'BUY'):
         # Попытка размещения ордера на покупку
         try:
@@ -103,6 +104,6 @@ def fn_place_order(order_type, client):
 
     print('Функция формирования ордера ОТРАБОТАЛА')
 
-    fn_pause()
+
 
 
