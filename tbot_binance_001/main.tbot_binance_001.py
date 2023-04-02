@@ -103,7 +103,7 @@ fn_write_logfile_msg (LOGFILE_NAME, datetime.now(), ' <INFO> Ожидание п
 
 def main():
     global BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2
-    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT, PRICE_START_TOKEN_2, PRICE_BUY_TOKEN_2, KEY, PRICE_DIFF_CURRENT
+    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT, PRICE_START_TOKEN_2, KEY
 
 
 
@@ -111,7 +111,7 @@ def main():
     KEY = ''
 
     PRICE_START_TOKEN_2 = fn_get_price(input_var.SYMBOL, input_var.URL)
-    PRICE_BUY_TOKEN_2 = 0        # При запуске = 0, потом туда поместится цена купленного токена.
+    GLOBAL.PRICE_BUY_TOKEN_2 = 0        # При запуске = 0, потом туда поместится цена купленного токена.
 
     # Пара индексов. Определяют статус ордера ПОКУПКА - ПРОДАЖА .(buy=False и sell=True)-Ожидание покупки.(buy=True и sell=False)-Ожидание продажи.
     buy = False     #  buy = False - значит, что мы еще ничего не купили. buy = True - значит, мы что то купили и нужно продать
@@ -134,9 +134,9 @@ def main():
         #RSI_CURRENT = int(RSI_TEST_INPUT)
 
         # Если ордеры на покупку уже былы, то PRICE_BUY содержит цену покупки и <> 0. Расчет текущей разницы в % и Допустимой минимальной цены продажи.
-        if (PRICE_BUY_TOKEN_2 != 0):
-            PRICE_DIFF_CURRENT = (PRICE_TOKEN_2_CURRENT - PRICE_BUY_TOKEN_2) / PRICE_BUY_TOKEN_2 * 100
-            PRICE_SELL_MIN = PRICE_BUY_TOKEN_2 + PRICE_BUY_TOKEN_2 / 100 * input_var.PRICE_DIFF
+        if (GLOBAL.PRICE_BUY_TOKEN_2 != 0):
+            GLOBAL.PRICE_DIFF_CURRENT = (PRICE_TOKEN_2_CURRENT - GLOBAL.PRICE_BUY_TOKEN_2) / GLOBAL.PRICE_BUY_TOKEN_2 * 100
+            PRICE_SELL_MIN = GLOBAL.PRICE_BUY_TOKEN_2 + GLOBAL.PRICE_BUY_TOKEN_2 / 100 * input_var.PRICE_DIFF
 
         # Условие для покупки токена: Только по текущему значению RSI
         if ((RSI_CURRENT <= input_var.RSI_MIN and not buy) or GLOBAL.ORDER_MANUAL_SET == 'BUY'):
@@ -144,7 +144,7 @@ def main():
             # Фиксируем цену закупки в глобальную переменную PRICE_BUY_TOKEN_2
             # Сбрасываем глобальную переменную, если мы создали ордер по ней, ее нужно обнулить.
 
-            PRICE_BUY_TOKEN_2 = PRICE_TOKEN_2_CURRENT
+            GLOBAL.PRICE_BUY_TOKEN_2 = PRICE_TOKEN_2_CURRENT
 
             fn_place_order('BUY', RSI_CURRENT, keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
             print('buy=', buy,' sell=', sell )
@@ -175,7 +175,7 @@ def main():
                 buy = not buy
                 sell = not sell
         # ========= РОБОЧИЙ ======Условия на продажу. По текущему значению RSI и чтобы навар был не меньше фиксированного
-        #if (RSI_CURRENT >= input_var.RSI_MAX and PRICE_DIFF_CURRENT >= input_var.PRICE_DIFF and not sell):
+        #if (RSI_CURRENT >= input_var.RSI_MAX and GLOBAL.PRICE_DIFF_CURRENT >= input_var.PRICE_DIFF and not sell):
             # ВЫзов функции создания ордеоа с параметром на продажу
 
             fn_place_order('SELL', RSI_CURRENT, keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
@@ -208,7 +208,6 @@ def main():
         listener.start()
         # Обработка нажатых клавиш
         if (GLOBAL.PRESS_KEY == 'b'):
-            listener.stop()
             print('GLOBAL.ORDER_MANUAL_SET => BUY')
             GLOBAL.ORDER_MANUAL_SET = 'BUY'
             #input_buy_char = input('СФОРМИРОВАТЬ ОРДЕР НА ПОКУПКУ? Y/n:')
@@ -217,7 +216,6 @@ def main():
             #    GLOBAL.ORDER_MANUAL_SET = 'BUY'
             #    fn_pause()
         if (GLOBAL.PRESS_KEY == 's'):
-            listener.stop()
             print('GLOBAL.ORDER_MANUAL_SET => SELL')
             GLOBAL.ORDER_MANUAL_SET = 'SELL'
             #input_buy_char = input('СФОРМИРОВАТЬ ОРДЕР НА ПРОДАЖУ? Y/n:')
@@ -226,7 +224,6 @@ def main():
             #    GLOBAL.ORDER_MANUAL_SET = 'SELL'
             #    fn_pause()
         if (GLOBAL.PRESS_KEY == 'q'):
-            listener.stop()
             input_buy_char = input('ЗАКОНЧИТЬ ВЫПОЛНЕНИЕ ПРОГРАММЫ? y/n:')
 #            sys.exit('ЗАВЕРШЕНИЕ ПРОГРАММЫ ПО ТРЕБОВАНИЮ ПОЛЬЗОВАТЕЛЯ.....')
             if (input_buy_char == 'y'):

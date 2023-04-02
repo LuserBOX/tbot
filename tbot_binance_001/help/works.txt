@@ -9,4 +9,26 @@
 
 1. РАБОТАЕТ КРИВО:
 - САМ НАЖИМАЕТ ENTER и входит в режим торгов.
--
+- Не отрабатывают вложеннные условия нажатия
+
+ВЫЛЕТЕЛ
+Exception in thread Thread-155:
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/threading.py", line 980, in _bootstrap_inner
+    self.run()
+  File "/home/stalker/PycharmProjects/tbot/venv/lib/python3.9/site-packages/pynput/_util/__init__.py", line 210, in run
+    self._run()
+  File "/home/stalker/PycharmProjects/tbot/venv/lib/python3.9/site-packages/pynput/keyboard/_xorg.py", line 545, in _run
+    super(Listener, self)._run()
+  File "/home/stalker/PycharmProjects/tbot/venv/lib/python3.9/site-packages/pynput/_util/xorg.py", line 382, in _run
+    self._display_stop = Xlib.display.Display()
+  File "/home/stalker/PycharmProjects/tbot/venv/lib/python3.9/site-packages/Xlib/display.py", line 89, in __init__
+    self.display = _BaseDisplay(display)
+  File "/home/stalker/PycharmProjects/tbot/venv/lib/python3.9/site-packages/Xlib/display.py", line 71, in __init__
+    protocol_display.Display.__init__(self, *args, **keys)
+  File "/home/stalker/PycharmProjects/tbot/venv/lib/python3.9/site-packages/Xlib/protocol/display.py", line 166, in __init__
+    raise error.DisplayConnectionError(self.display_name, r.reason)
+Xlib.error.DisplayConnectionError: Can't connect to display ":0": b'Maximum number of clients reached'
+
+Process finished with exit code 137 (interrupted by signal 9: SIGKILL)
+

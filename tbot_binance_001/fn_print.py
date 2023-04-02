@@ -7,7 +7,6 @@ from colorama import init, Fore
 init(autoreset=True)
 from datetime import datetime
 
-
 def fn_print_header (simbol, token_1, token_2, balance_start_token1, balance_start_locked_token1, balance_start_token2, balance_start_locked_token2,price_token2_current, interval, rsi_limit, rsi_min, rsi_max, rsi_period, qnty):
     print('Trading BOT: binance-rsi-001 STARTING....\n\n', Fore.RED +'  ПЕРЕД ЗАПУСКОМ ПЕРЕПРОВЕРЬТЕ ПАРАМЕТРЫ:')
     print(Fore.GREEN + \
@@ -101,6 +100,7 @@ def fn_print_current_status (datetime_start, balance_start_token_1_float, balanc
           'СТАТУС ОРДЕРА                 :', msg_status, '\n', \
           'Покупаем/Продаем              :', input_var.color_blue.format(input_var.QNTY), input_var.color_blue.format(input_var.TOKEN_2), '\n', \
           'Минимальный навар             :', input_var.color_blue.format(input_var.PRICE_DIFF), input_var.color_blue.format('%\n'), \
+          'Текущий навар                 :', input_var.color_yellow_bold.format(GLOBAL.PRICE_DIFF_CURRENT), '%\n', \
           'Цена 1', input_var.TOKEN_2, 'на момент старта   :', price_start_token_2, input_var.TOKEN_1, '\n', \
           'Текущая цена 1', input_var.TOKEN_2, '           :', price_current_token_2, input_var.TOKEN_1, '\n', \
           'Текущая стоимость ордера      :', round(price_current_token_2 * input_var.QNTY, input_var.PRICE_ORDER_ROUND), input_var.TOKEN_1)
