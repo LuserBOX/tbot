@@ -208,6 +208,7 @@ def main():
         listener.start()
         # Обработка нажатых клавиш
         if (GLOBAL.PRESS_KEY == 'b'):
+            listener.stop()
             print('GLOBAL.ORDER_MANUAL_SET => BUY')
             GLOBAL.ORDER_MANUAL_SET = 'BUY'
             #input_buy_char = input('СФОРМИРОВАТЬ ОРДЕР НА ПОКУПКУ? Y/n:')
@@ -216,6 +217,7 @@ def main():
             #    GLOBAL.ORDER_MANUAL_SET = 'BUY'
             #    fn_pause()
         if (GLOBAL.PRESS_KEY == 's'):
+            listener.stop()
             print('GLOBAL.ORDER_MANUAL_SET => SELL')
             GLOBAL.ORDER_MANUAL_SET = 'SELL'
             #input_buy_char = input('СФОРМИРОВАТЬ ОРДЕР НА ПРОДАЖУ? Y/n:')
@@ -224,10 +226,11 @@ def main():
             #    GLOBAL.ORDER_MANUAL_SET = 'SELL'
             #    fn_pause()
         if (GLOBAL.PRESS_KEY == 'q'):
-            input_buy_char = input('ЗАКОНЧИТЬ ВЫПОЛНЕНИЕ ПРОГРАММЫ? Y/n:')
-            if (input_buy_char == 'Y'):
+            listener.stop()
+            input_buy_char = input('ЗАКОНЧИТЬ ВЫПОЛНЕНИЕ ПРОГРАММЫ? y/n:')
+#            sys.exit('ЗАВЕРШЕНИЕ ПРОГРАММЫ ПО ТРЕБОВАНИЮ ПОЛЬЗОВАТЕЛЯ.....')
+            if (input_buy_char == 'y'):
                 sys.exit('ЗАВЕРШЕНИЕ ПРОГРАММЫ ПО ТРЕБОВАНИЮ ПОЛЬЗОВАТЕЛЯ.....')
-        print(a)
 
 if __name__ == '__main__':
 
