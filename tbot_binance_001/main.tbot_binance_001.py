@@ -103,7 +103,7 @@ fn_write_logfile_msg (LOGFILE_NAME, datetime.now(), ' <INFO> Ожидание п
 
 def main():
     global BALANCE_CURRENT_TOKEN_1, BALANCE_LOCKED_CURRENT_TOKEN_1, BALANCE_CURRENT_TOKEN_2, BALANCE_LOCKED_CURRENT_TOKEN_2
-    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT, PRICE_START_TOKEN_2, PRICE_BUY_TOKEN_2, KEY
+    global PRICE_TOKEN_2_CURRENT, RSI_CURRENT, PRICE_START_TOKEN_2, PRICE_BUY_TOKEN_2, KEY, PRICE_DIFF_CURRENT
 
 
 
@@ -167,8 +167,10 @@ def main():
         if ((RSI_CURRENT >= input_var.RSI_MAX and not sell) or GLOBAL.ORDER_MANUAL_SET == 'SELL'):
             buy = not buy
             sell = not sell
+            # Если продажа была РУЧНАЯ (ар установке переменной GLOBAL.ORDER_MANUAL_SET), то переменную ОБНУДИТЬ и ЛОГИКУ исправить
             if (GLOBAL.ORDER_MANUAL_SET == 'SELL'):
                 GLOBAL.ORDERS_NUMBER_SELL_MANUAL = GLOBAL.ORDERS_NUMBER_SELL_MANUAL + 1
+                GLOBAL.ORDER_MANUAL_SET = ''
                 fn_pause()
                 buy = not buy
                 sell = not sell
@@ -177,17 +179,11 @@ def main():
             # ВЫзов функции создания ордеоа с параметром на продажу
 
             fn_place_order('SELL', RSI_CURRENT, keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
+
             # Сбрасываем глобальную переменную, если мы создали ордер по ней, ее нужно обнулить.
-            GLOBAL.ORDER_MANUAL_SET = ''
 
             print('buy=', buy, ' sell=', sell)
 
-
-
-
-
-            print('buy=', buy, ' sell=', sell)
-            GLOBAL.ORDER_MANUAL_SET = ''
             # Увеличиваем счетчик ордеров на покупку на 1
             GLOBAL.ORDERS_NUMBER_SELL = GLOBAL.ORDERS_NUMBER_SELL + 1
             # Расчет общего колва автоматических ордеров на продажу
@@ -231,8 +227,7 @@ def main():
             input_buy_char = input('ЗАКОНЧИТЬ ВЫПОЛНЕНИЕ ПРОГРАММЫ? Y/n:')
             if (input_buy_char == 'Y'):
                 sys.exit('ЗАВЕРШЕНИЕ ПРОГРАММЫ ПО ТРЕБОВАНИЮ ПОЛЬЗОВАТЕЛЯ.....')
-        time.sleep(1)
-
+        print(a)
 
 if __name__ == '__main__':
 
