@@ -58,11 +58,11 @@ def sort_list(list):
     return getted_list
 
 # Функция получает свечи
-def get_klines(symbol_list)
+def get_klines(symbol_list):
     global extremum_dict
     global volume_dict
     df = pd.DataFrame(columns=[symbol_list],index=['high','low'])
-    for symbol in symbol_list
+    for symbol in symbol_list:
         kline = client.get_klines(symbol=symbol, interval=client.KLINE_INTERVAL_1DAY, limit=1)
         df.loc['high',symbol] = float(kline[0][2]) # Хаи интересующей монеты
         df.loc['low', symbol] = float(kline[0][3]) # Лои (низы) интересующей монеты
@@ -84,6 +84,6 @@ a1 = get_spot_list()
 a2 = get_futures_list()
 
 sort_list(a1)
-
+get_klines(a1)
 print(a1)
 print(a2)
