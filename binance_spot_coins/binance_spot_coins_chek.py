@@ -9,6 +9,7 @@ is_futures = []
 
 client = Client(keys.BINANCE_API_KEY, keys.BINANCE_API_SECRET)
 
+
 # . Функция. Возвращает список всех спотовых монет.
 def get_spot_list():
     global spot_list
@@ -29,6 +30,7 @@ def get_spot_list():
 
     return spot_list
 
+
 def get_futures_list():
     global futures_list
     futures_info = client.futures_exchange_info()
@@ -45,13 +47,43 @@ def get_futures_list():
             futures_list.append(symbol)
     return futures_list
 
-
+# Функция сортировки, фильтрации и отсеивания ненужные
 def sort_list(list):
     df = pd.DataFrame(list, columns=['symbol'])
+    df = df[~(df.symbol.str.contains("BULL|BEAR"))]
+    df = df[~(df.symbol.str.contains("BUSD|USDC"))]
+    df = df[df.symbol.str.contains("USDT")]
+    getted_list =df['symbol'].to_list()
+    print(getted_list)
+    return getted_list
+
+# Функция получает свечи
+def get_klines(symbol_list)
+    global extremum_dict
+    global volume_dict
+    df = pd.DataFrame(columns=[symbol_list],index=['high','low'])
+    for symbol in symbol_list
+        kline = client.get_klines(symbol=symbol, interval=client.KLINE_INTERVAL_1DAY, limit=1)
+        df.loc['high',symbol] = float(kline[0][2]) # Хаи интересующей монеты
+        df.loc['low', symbol] = float(kline[0][3]) # Лои (низы) интересующей монеты
+        volume_dict[symbol] = None
+     # Отсмортируем Дата фреймы
+    df = df.T
+    data_dict = df.to_dict()
+    for symbol, value_dict in data_dict.items():
+        for key in value_dict.keys():
+            extremum_dict[key[0]]={'high': data_dict['high'][key], 'low': data_dict['low'][key]}
+    print(extremum_dict)
+
+
+
+
+
 
 a1 = get_spot_list()
 a2 = get_futures_list()
 
+sort_list(a1)
+
 print(a1)
 print(a2)
-
