@@ -3,11 +3,11 @@ from binance.client import Client
 import matplotlib.pyplot as plt
 
 # Обработка файла и вывод графика
-#df = pd.read_csv('apple.csv', index_col='Date', parse_dates=True)
-#df = df.sort_index()
-#new_sample_df = df.loc['2012-Feb':'2017-Feb', ['Close']]
-#new_sample_df.plot()
-#plt.show()
+# df = pd.read_csv('apple.csv', index_col='Date', parse_dates=True)
+# df = df.sort_index()
+# new_sample_df = df.loc['2012-Feb':'2017-Feb', ['Close']]
+# new_sample_df.plot()
+# plt.show()
 
 # Массив. Будет хранить все спотовые монеты.
 spot_list = []
@@ -58,12 +58,19 @@ def get_futures_list():
     return futures_list
 
 
-# Функция сортировки, фильтрации и отсеивания ненужные
+# Функция сортировки и фильтрации.
+# Из полученного списка, функция делает объект DataFrame, удаляет из него все строки с BUSD, USDC.
+# После чего опять преобразует DataFrame в список.
 def sort_list(list):
     # Создаем DataFrame и именуем столбец с символами- symbol
     df = pd.DataFrame(list, columns=['symbol'])
     # Удаляем все строки в которых есть BUSD или USDC
+    df_test1 = df[~(df.symbol.str.contains("BULL|BEAR|BUSD|USDC|RDNT"))]
+    print('df_test1=', df_test1)
+    df = df[~(df.symbol.str.contains("BULL|BEAR"))]
+    print('df=', df)
     df = df[~(df.symbol.str.contains("BUSD|USDC"))]
+    print('df=', df)
     # Оставляем только строки в которых есть USDT
     df = df[df.symbol.str.contains("USDT")]
     # Преобразуем столбец 'symbol' DataFrame в список.
@@ -89,11 +96,33 @@ def get_klines(symbol_list):
             extremem_dict[key[0]] = {'high': data_dict['high'][key], 'low': data_dict['low'][key]}
     # print(extremum_dict)
 
-test_list = ['ETHBTC', 'LTCBTC', 'BNBBTC', 'NEOBTC', 'QTUMETH', 'EOSETH', 'SNTETH', 'BNTETH', 'BCCBTC', 'GASBTC', 'BNBETH',\
+
+test_list = ['ETHBTC', 'LTCBTC', 'BNBBTC', 'NEOBTC', 'QTUMETH', 'EOSETH', 'SNTETH', 'BNTETH', 'BCCBTC', 'GASBTC',
+             'BNBETH', \
              'BTCUSDT', 'ETHUSDT', 'HSRBTC', 'OAXETH', 'DNTETH', 'MCOETH', 'ICNETH', 'MCOBTC', 'WTCBTC', 'WTCETH', \
              'LRCBTC', 'LRCETH', 'QTUMBTC', 'YOYOBTC', 'OMGBTC', 'OMGETH', 'ZRXBTC']
-#a1 = get_spot_list()
-#a2 = get_futures_list()
+# a1 = get_spot_list()
+# a2 = get_futures_list()
 
-b1 = sort_list(test_list)
-print('sort_list=',b1)
+
+# b1 = sort_list(get_spot_list())
+
+spot_coin = get_spot_list()
+futures_coin = get_futures_list()
+
+# формируем список из первого списка но если их нет во втором
+getted_list = [item for item in spot_coin if item not in futures_coin]
+getted_list_len = len(getted_list)
+
+getted_list_sort = sort_list(getted_list)
+
+print(len(get_spot_list()))
+print('futures_coin:',get_futures_list())
+print(len(get_futures_list()))
+
+print('getted_list=', getted_list)
+print('getted_list_len=', getted_list_len)
+
+# Вывод списка монет после фильтрации, торгующиеся только за СПОТ.
+print('getted_list_sort:', getted_list_sort)
+print('getted_list_sort_len:', len(getted_list_sort))

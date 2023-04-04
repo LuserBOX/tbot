@@ -1,3 +1,13 @@
+Полезные ссылки на теорию и примеры работы функций
+https://www.codecamp.ru/blog/pandas-column-to-list/
+https://www.codecamp.ru/blog/pandas-check-if-column-contains-string/
+https://khashtamov.com/ru/pandas-introduction/
+https://pythonru.com/biblioteki/struktury-dannyh-v-pandas
+https://skillbox.ru/media/code/metody-append-i-extend-v-python-dobavlyaem-elementy-v-spisok/
+
+
+
+
 Программа получает от Бинанса перечень монет, торгующихся только спотом.
 т.е. нет фьючерсной тоговли
 
