@@ -126,3 +126,6 @@ print('getted_list_len=', getted_list_len)
 # Вывод списка монет после фильтрации, торгующиеся только за СПОТ.
 print('getted_list_sort:', getted_list_sort)
 print('getted_list_sort_len:', len(getted_list_sort))
+
+# Вывод каждого значения списка в новой строке
+print(*getted_list_sort, sep='\n')

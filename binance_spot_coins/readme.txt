@@ -1,3 +1,6 @@
+JSON Pretty Print
+https://jsonformatter.org/json-pretty-print
+
 Полезные ссылки на теорию и примеры работы функций
 https://www.codecamp.ru/blog/pandas-column-to-list/
 https://www.codecamp.ru/blog/pandas-check-if-column-contains-string/
