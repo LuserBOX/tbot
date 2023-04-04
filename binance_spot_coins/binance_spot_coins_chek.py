@@ -1,5 +1,13 @@
 import keys, requests, websockets, asyncio, time, json, pprint, pandas as pd, unicorn_binance_websocket_api
 from binance.client import Client
+import matplotlib.pyplot as plt
+
+# Обработка файла и вывод графика
+#df = pd.read_csv('apple.csv', index_col='Date', parse_dates=True)
+#df = df.sort_index()
+#new_sample_df = df.loc['2012-Feb':'2017-Feb', ['Close']]
+#new_sample_df.plot()
+#plt.show()
 
 # Массив. Будет хранить все спотовые монеты.
 spot_list = []
@@ -52,12 +60,14 @@ def get_futures_list():
 
 # Функция сортировки, фильтрации и отсеивания ненужные
 def sort_list(list):
+    # Создаем DataFrame и именуем столбец с символами- symbol
     df = pd.DataFrame(list, columns=['symbol'])
-    df = df[~(df.symbol.str.contains("BULL|BEAR"))]
+    # Удаляем все строки в которых есть BUSD или USDC
     df = df[~(df.symbol.str.contains("BUSD|USDC"))]
+    # Оставляем только строки в которых есть USDT
     df = df[df.symbol.str.contains("USDT")]
+    # Преобразуем столбец 'symbol' DataFrame в список.
     getted_list = df['symbol'].to_list()
-#    print(getted_list)
     return getted_list
 
 
@@ -77,13 +87,13 @@ def get_klines(symbol_list):
     for symbol, value_dict in data_dict.items():
         for key in value_dict.keys():
             extremem_dict[key[0]] = {'high': data_dict['high'][key], 'low': data_dict['low'][key]}
-    #print(extremum_dict)
+    # print(extremum_dict)
 
+test_list = ['ETHBTC', 'LTCBTC', 'BNBBTC', 'NEOBTC', 'QTUMETH', 'EOSETH', 'SNTETH', 'BNTETH', 'BCCBTC', 'GASBTC', 'BNBETH',\
+             'BTCUSDT', 'ETHUSDT', 'HSRBTC', 'OAXETH', 'DNTETH', 'MCOETH', 'ICNETH', 'MCOBTC', 'WTCBTC', 'WTCETH', \
+             'LRCBTC', 'LRCETH', 'QTUMBTC', 'YOYOBTC', 'OMGBTC', 'OMGETH', 'ZRXBTC']
+#a1 = get_spot_list()
+#a2 = get_futures_list()
 
-a1 = get_spot_list()
-a2 = get_futures_list()
-
-b1 = sort_list(a1)
-
-#print(b1)
-
+b1 = sort_list(test_list)
+print('sort_list=',b1)
